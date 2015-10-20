@@ -90,7 +90,12 @@ Value getinfo(const Array& params, bool fHelp)
     obj.push_back(Pair("stake",         ValueFromAmount(pwalletMain->GetStake())));
     obj.push_back(Pair("blocks",        (int)nBestHeight));
     obj.push_back(Pair("timeoffset",    (boost::int64_t)GetTimeOffset()));
-    obj.push_back(Pair("moneysupply",   ValueFromAmount(pindexBest->nMoneySupply)));
+
+    // moneysupply: 774840.15194814 CLICK was burned after ICO:
+    // CLCKxxxYBTxDESTRYxxADDRESSXXXTo8SX
+    // tx: 15241c408d25b55b1f4ec2f26704a7d095983bc90ed2c1d183de20a5e0bb68e5
+    obj.push_back(Pair("moneysupply",   ValueFromAmount(pindexBest->nMoneySupply - 774840.15194814 * COIN)));
+	
     obj.push_back(Pair("connections",   (int)vNodes.size()));
     obj.push_back(Pair("proxy",         (proxy.first.IsValid() ? proxy.first.ToStringIPPort() : string())));
     obj.push_back(Pair("ip",            addrSeenByPeer.ToStringIP()));
