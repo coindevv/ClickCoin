@@ -419,20 +419,10 @@ void ThreadGetMyExternalIP(void* parg)
     }
 }
 
-
-
-
-
 void AddressCurrentlyConnected(const CService& addr)
 {
     addrman.Connected(addr);
 }
-
-
-
-
-
-
 
 CNode* FindNode(const CNetAddr& ip)
 {
@@ -1211,20 +1201,16 @@ void MapPort()
 }
 #endif
 
-
-
-
-
-
-
-
-
 // DNS seeds
 // Each pair gives a source name and a seed name.
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strDNSSeed[][2] = {
-    	{"45.55.18.232", "45.55.18.232"},
+    {"node1", "node1.clickcoin.click"},
+    {"node2", "node2.clickcoin.click"},
+    {"node3", "node3.clickcoin.click"},
+    {"node4", "node4.clickcoin.click"},
+    {"node5", "node5.clickcoin.click"},
 };
 
 void ThreadDNSAddressSeed(void* parg)
@@ -1281,17 +1267,6 @@ void ThreadDNSAddressSeed2(void* parg)
 
     printf("%d addresses found from DNS seeds\n", found);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 unsigned int pnSeed[] =
 {
