@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>593</width>
-    <height>319</height>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,9 +91,18 @@
         <cursorShape>IBeamCursor</cursorShape>
        </property>
        <property name="text">
-        <string>Copyright © 2009-2015 The Bitcoin developers
-Copyright © 2012-2015 The NovaCoin developers
-Copyright © 2015 The ClickCoin developers</string>
+        <string>
+Copyright © 2009-2015 The Bitcoin developers&lt;br/&gt;
+Copyright © 2012-2015 The NovaCoin developers&lt;br/&gt;
+Copyright © 2015 The ClickCoin developers&lt;br/&gt;&lt;br/&gt;
+Website: &lt;a href=&quot;http://clickcoin.click&quot;&gt;http://clickcoin.click&lt;/a&gt;
+       </string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
