@@ -100,6 +100,7 @@ private:
     RPCConsole *rpcConsole;
 
     QMovie *syncIconMovie;
+    QMovie *stakingOnMovie;
 
     /** Create the main UI actions. */
     void createActions();
