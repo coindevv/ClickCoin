@@ -141,7 +141,7 @@
           <enum>Qt::ActionsContextMenu</enum>
          </property>
          <property name="text">
-          <string notr="true">0.00 DRM</string>
+          <string notr="true">0.00 CLICK</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -221,7 +221,7 @@
           <enum>Qt::ActionsContextMenu</enum>
          </property>
          <property name="text">
-          <string notr="true">0.00 DRM</string>
+          <string notr="true">0.00 CLICK</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -307,7 +307,7 @@
           <enum>Qt::ActionsContextMenu</enum>
          </property>
          <property name="text">
-          <string notr="true">0.00 DRM</string>
+          <string notr="true">0.00 CLICK</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -345,7 +345,7 @@
           <enum>Qt::ActionsContextMenu</enum>
          </property>
          <property name="text">
-          <string notr="true">0.00 DRM</string>
+          <string notr="true">0.00 CLICK</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -361,7 +361,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>40</height>
+       <height>43</height>
       </size>
      </property>
      <property name="frameShape">
