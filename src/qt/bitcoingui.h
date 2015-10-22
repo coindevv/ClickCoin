@@ -109,6 +109,9 @@ private:
     void createToolBars();
     /** Create system tray (notification) icon */
     void createTrayIcon();
+	
+    void updateStyle();
+    void writeDefaultStyleSheet(const QString &qssPath);
 
 public slots:
     /** Set number of connections shown in the UI */
@@ -181,6 +184,7 @@ private slots:
     void toggleHidden();
     
     void updateStakingIcon();
+    void updateStyleSlot();
 };
 
 #endif

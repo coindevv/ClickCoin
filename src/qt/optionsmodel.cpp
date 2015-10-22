@@ -6,6 +6,9 @@
 #include "walletdb.h"
 #include "guiutil.h"
 
+// shared UI settings in guiutil.h
+bool fUseClickcoinTheme;
+
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -44,6 +47,7 @@ void OptionsModel::Init()
     fMinimizeToTray = settings.value("fMinimizeToTray", false).toBool();
     fMinimizeOnClose = settings.value("fMinimizeOnClose", false).toBool();
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
+    fUseClickcoinTheme = settings.value("fUseClickcoinTheme", true).toBool();
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     nReserveBalance = settings.value("nReserveBalance").toLongLong();
     language = settings.value("language", "").toString();
@@ -114,6 +118,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("language", "");
         case CoinControlFeatures:
             return QVariant(fCoinControlFeatures);
+        case UseClickcoinTheme:
+            return QVariant(fUseClickcoinTheme);
         default:
             return QVariant();
         }
@@ -213,6 +219,10 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
             emit coinControlFeaturesChanged(fCoinControlFeatures);
             }
+            break;
+        case UseClickcoinTheme:
+            fUseClickcoinTheme = value.toBool();
+            settings.setValue("fUseClickcoinTheme", fUseClickcoinTheme);
             break;
         default:
             break;
