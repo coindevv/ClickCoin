@@ -61,8 +61,8 @@ QActionGroup
 
 QToolBar
 {
-    border-top: 1px solid #AAAAAA;
-    border-bottom: 1px solid #AAAAAA;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
     background: #F5F5F5;
 }
 
@@ -74,6 +74,8 @@ QToolButton
         border: none;
         padding-right: 6px;
         padding-left: 6px;
+        padding-top: 6px;
+        padding-bottom: 6px;
 }
 
 QToolButton:hover
