@@ -20,22 +20,24 @@ INCLUDEPATHS= \
  -I"$(DEPSDIR)/boost_1_55_0" \
  -I"$(DEPSDIR)/db-6.0.20/build_unix" \
  -I"$(DEPSDIR)/openssl-1.0.1p/include" \
+ -I"$(DEPSDIR)/include" \
  -I"$(DEPSDIR)"
 
 LIBPATHS= \
+ -L"$(DEPSDIR)/lib" \
  -L"$(DEPSDIR)/boost_1_55_0/stage/lib" \
  -L"$(DEPSDIR)/db-6.0.20/build_unix" \
  -L"$(DEPSDIR)/openssl-1.0.1p"
 
 LIBS= \
- -l boost_system-mt \
- -l boost_filesystem-mt \
- -l boost_program_options-mt \
- -l boost_thread_win32-mt \
- -l boost_chrono-mt \
+ -l boost_system-mt-s \
+ -l boost_filesystem-mt-s \
+ -l boost_program_options-mt-s \
+ -l boost_thread_win32-mt-s \
+ -l boost_chrono-mt-s \
  -l db_cxx \
  -l ssl \
- -l crypto
+ -l crypto 
 
 DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE
 DEBUGFLAGS=-g
@@ -61,6 +63,17 @@ LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l w
 HEADERS = $(wildcard *.h)
 
 OBJS= \
+    obj/groestl.o \
+    obj/blake.o \
+    obj/bmw.o \
+    obj/skein.o \
+    obj/keccak.o \
+    obj/shavite.o \
+    obj/jh.o \
+    obj/luffa.o \
+    obj/cubehash.o \
+    obj/echo.o \
+    obj/simd.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -116,7 +129,14 @@ obj/%.o: %.cpp $(HEADERS)
 ClickCoind.exe: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) -lshlwapi
 	$(STRIP) ClickCoind.exe
-
+	
+obj/%.o: %.c
+	$(CXX) -c $(xCXXFLAGS) -fpermissive -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+	
 obj/scrypt-x86.o: scrypt-x86.S
 	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
 

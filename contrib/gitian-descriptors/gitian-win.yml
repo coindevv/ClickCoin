@@ -52,4 +52,4 @@ script: |
   make -f makefile.linux-mingw $MAKEOPTS DEPSDIR=$STAGING ClickCoind.exe USE_UPNP=0 DEBUGFLAGS="-frandom-seed=clickcoin" USE_SSE2=1
   $HOST-strip ClickCoind.exe
   mkdir $OUTDIR/daemon
-  cp clickcoind.exe $OUTDIR/daemon
+  cp ClickCoind.exe $OUTDIR/daemon
