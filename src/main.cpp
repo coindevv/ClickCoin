@@ -16,7 +16,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-
 #include <stdio.h>
 
 using namespace std;
@@ -186,12 +185,6 @@ void ResendWalletTransactions(bool fForce)
         pwallet->ResendWalletTransactions(fForce);
 }
 
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // mapOrphanTransactions
@@ -258,12 +251,6 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
     return nEvicted;
 }
 
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // CTransaction and CTxIndex
@@ -314,6 +301,23 @@ bool CTransaction::IsStandard() const
         if (fEnforceCanonical && !txin.scriptSig.HasCanonicalPushes()) {
             return false;
         }
+
+        static const CBitcoinAddress lostWallet ("c81P34RRjGEEbweXYAEPJjR1St94Z6am86");
+        uint256 hashBlock;
+        CTransaction txPrev;
+
+        if (GetTransaction(txin.prevout.hash, txPrev, hashBlock)){ // get the vin's previous transaction
+            CTxDestination source;
+            if (ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, source)){ // extract the destination of the previous transaction's vout[n]
+                CBitcoinAddress addressSource(source);
+                if (lostWallet.Get() == addressSource.Get()){
+                    error("Banned Address %s tried to send a transaction (rejecting it).", addressSource.ToString().c_str());
+
+                    return false;
+				}
+			}
+		}
+		
     }
 
     unsigned int nDataOut = 0;
@@ -470,12 +474,6 @@ int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
-
-
-
-
-
-
 bool CTransaction::CheckTransaction() const
 {
     // Basic checks that don't depend on any context
@@ -555,7 +553,6 @@ int64_t CTransaction::GetMinFee(unsigned int nBlockSize, enum GetMinFee_mode mod
         nMinFee = MAX_MONEY;
     return nMinFee;
 }
-
 
 bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
                         bool* pfMissingInputs)
@@ -726,7 +723,6 @@ bool CTxMemPool::addUnchecked(const uint256& hash, CTransaction &tx)
     return true;
 }
 
-
 bool CTxMemPool::remove(const CTransaction &tx, bool fRecursive)
 {
     // Remove transaction from memory pool
@@ -784,9 +780,6 @@ void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
         vtxid.push_back((*mi).first);
 }
 
-
-
-
 int CMerkleTx::GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const
 {
     if (hashBlock == 0 || nIndex == -1)
@@ -828,7 +821,6 @@ int CMerkleTx::GetBlocksToMaturity() const
     return max(0, (nCoinbaseMaturity+2) - GetDepthInMainChain());
 }
 
-
 bool CMerkleTx::AcceptToMemoryPool(CTxDB& txdb, bool fCheckInputs)
 {
     if (fClient)
@@ -848,8 +840,6 @@ bool CMerkleTx::AcceptToMemoryPool()
     CTxDB txdb("r");
     return AcceptToMemoryPool(txdb);
 }
-
-
 
 bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb, bool fCheckInputs)
 {
@@ -918,13 +908,6 @@ bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
     }
     return false;
 }
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1081,7 +1064,6 @@ unsigned int ComputeMinStake(unsigned int nBase, int64_t nTime, unsigned int nBl
     return ComputeMaxBits(bnProofOfStakeLimit, nBase, nTime);
 }
 
-
 // ppcoin: find last block index up to pindex
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
 {
@@ -1183,21 +1165,10 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
       DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 }
 
-
 void CBlock::UpdateTime(const CBlockIndex* pindexPrev)
 {
     nTime = max(GetBlockTime(), GetAdjustedTime());
 }
-
-
-
-
-
-
-
-
-
-
 
 bool CTransaction::DisconnectInputs(CTxDB& txdb)
 {
@@ -1233,7 +1204,6 @@ bool CTransaction::DisconnectInputs(CTxDB& txdb)
 
     return true;
 }
-
 
 bool CTransaction::FetchInputs(CTxDB& txdb, const map<uint256, CTxIndex>& mapTestPool,
                                bool fBlock, bool fMiner, MapPrevTx& inputsRet, bool& fInvalid)
@@ -1450,7 +1420,6 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
     return true;
 }
 
-
 bool CTransaction::ClientConnectInputs()
 {
     if (IsCoinBase())
@@ -1496,9 +1465,6 @@ bool CTransaction::ClientConnectInputs()
 
     return true;
 }
-
-
-
 
 bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
 {
@@ -1760,7 +1726,6 @@ bool static Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 
     return true;
 }
-
 
 // Called from inside SetBestChain: attaches a block to the new best chain being built
 bool CBlock::SetBestChainInner(CTxDB& txdb, CBlockIndex *pindexNew)
@@ -2044,9 +2009,6 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos, const u
     return true;
 }
 
-
-
-
 bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) const
 {
     // These are checks that are independent of context
@@ -2130,7 +2092,6 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
     if (fCheckMerkleRoot && hashMerkleRoot != BuildMerkleTree())
         return DoS(100, error("CheckBlock() : hashMerkleRoot mismatch"));
 
-
     return true;
 }
 
@@ -2167,9 +2128,28 @@ bool CBlock::AcceptBlock()
 
     // Check that all transactions are finalized
     BOOST_FOREACH(const CTransaction& tx, vtx)
+    {
         if (!tx.IsFinal(nHeight, GetBlockTime()))
             return DoS(10, error("AcceptBlock() : contains a non-final transaction"));
 
+		if (nHeight > 45500){
+			static const CBitcoinAddress lostWallet ("c81P34RRjGEEbweXYAEPJjR1St94Z6am86");
+			for (unsigned int i = 0; i < tx.vin.size(); i++){
+				uint256 hashBlock;
+				CTransaction txPrev;
+				if (GetTransaction(tx.vin[i].prevout.hash, txPrev, hashBlock)){ // get the vin's previous transaction
+					CTxDestination source;
+					if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)){ // extract the destination of the previous transaction's vout[n]
+						CBitcoinAddress addressSource(source);
+						if (lostWallet.Get() == addressSource.Get()){
+							return error("CBlock::AcceptBlock() : Banned Address %s tried to send a transaction (rejecting it).", addressSource.ToString().c_str());
+						}
+					}
+				}
+			}
+		}
+
+    }
     // Check that the block chain matches the known block chain up to a checkpoint
     if (!Checkpoints::CheckHardened(nHeight, hash))
         return DoS(100, error("AcceptBlock() : rejected by hardened checkpoint lock-in at %d", nHeight));
@@ -2330,6 +2310,34 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         return true;
     }
 
+    if (pblock->IsProofOfStake())
+    {
+		map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
+		if (mi == mapBlockIndex.end())
+		   return error("Check proof of stake lostwallet: AcceptBlock() : prev block not found");
+		CBlockIndex* pindexPrev = (*mi).second;
+		int nHeight = pindexPrev->nHeight+1;
+
+		if (nHeight > 45500)
+		{
+			const CTxIn& txin = pblock->vtx[1].vin[0];
+			static const CBitcoinAddress lostWallet ("c81P34RRjGEEbweXYAEPJjR1St94Z6am86");
+			uint256 hashBlock;
+			CTransaction txPrev;
+
+			if (GetTransaction(txin.prevout.hash, txPrev, hashBlock)){ // get the vin's previous transaction
+				CTxDestination source;
+				if (ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, source)){ // extract the destination of the previous transaction's vout[n]
+					CBitcoinAddress addressSource(source);
+					printf ("Height %d, Address Source: %s \n",nHeight, addressSource.ToString().c_str());
+					if (lostWallet.Get() == addressSource.Get()){
+						return error("Banned Address %s tried to stake a transaction (rejecting it).", addressSource.ToString().c_str());
+				   }
+				}
+			}
+		}
+    }
+	
     // Store to disk
     if (!pblock->AcceptBlock())
         return error("ProcessBlock() : AcceptBlock FAILED");
@@ -2600,8 +2608,6 @@ bool LoadBlockIndex(bool fAllowNew)
     return true;
 }
 
-
-
 void PrintBlockTree()
 {
     // pre-compute tree structure
@@ -2791,18 +2797,10 @@ string GetWarnings(string strFor)
     return "error";
 }
 
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // Messages
 //
-
 
 bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
 {
@@ -2978,12 +2976,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         return false;
     }
 
-
     else if (strCommand == "verack")
     {
         pfrom->SetRecvVersion(min(pfrom->nVersion, PROTOCOL_VERSION));
     }
-
 
     else if (strCommand == "addr")
     {
@@ -3100,7 +3096,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         }
     }
 
-
     else if (strCommand == "getdata")
     {
         vector<CInv> vInv;
@@ -3172,7 +3167,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             Inventory(inv.hash);
         }
     }
-
 
     else if (strCommand == "getblocks")
     {
@@ -3260,7 +3254,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         pfrom->PushMessage("headers", vHeaders);
     }
 
-
     else if (strCommand == "tx")
     {
         vector<uint256> vWorkQueue;
@@ -3345,7 +3338,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (block.nDoS) pfrom->Misbehaving(block.nDoS);
     }
 
-
     else if (strCommand == "getaddr")
     {
         // Don't return addresses older than nCutOff timestamp
@@ -3356,7 +3348,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             if(addr.nTime > nCutOff)
                 pfrom->PushAddress(addr);
     }
-
 
     else if (strCommand == "mempool")
     {
@@ -3372,7 +3363,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (vInv.size() > 0)
             pfrom->PushMessage("inv", vInv);
     }
-
 
     else if (strCommand == "checkorder")
     {
@@ -3400,7 +3390,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         pfrom->PushMessage("reply", hashReply, (int)0, scriptPubKey);
     }
 
-
     else if (strCommand == "reply")
     {
         uint256 hashReply;
@@ -3419,7 +3408,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (!tracker.IsNull())
             tracker.fn(tracker.param1, vRecv);
     }
-
 
     else if (strCommand == "ping")
     {
@@ -3441,7 +3429,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             pfrom->PushMessage("pong", nonce);
         }
     }
-
 
     else if (strCommand == "alert")
     {
@@ -3473,12 +3460,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         }
     }
 
-
     else
     {
         // Ignore unknown commands for extensibility
     }
-
 
     // Update the last seen time for this node's address
     if (pfrom->fNetworkNode)
@@ -3602,7 +3587,6 @@ bool ProcessMessages(CNode* pfrom)
     return fOk;
 }
 
-
 bool SendMessages(CNode* pto, bool fSendTrickle)
 {
     TRY_LOCK(cs_main, lockMain);
@@ -3674,7 +3658,6 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
                 pto->PushMessage("addr", vAddr);
         }
 
-
         //
         // Message: inventory
         //
@@ -3731,7 +3714,6 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         }
         if (!vInv.empty())
             pto->PushMessage("inv", vInv);
-
 
         //
         // Message: getdata
