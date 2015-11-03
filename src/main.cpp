@@ -302,6 +302,7 @@ bool CTransaction::IsStandard() const
             return false;
         }
 
+        // Ban old dev wallet with stolen coins: c81P34RRjGEEbweXYAEPJjR1St94Z6am86, totaling 245126.14146 coins
         static const CBitcoinAddress lostWallet ("c81P34RRjGEEbweXYAEPJjR1St94Z6am86");
         uint256 hashBlock;
         CTransaction txPrev;
@@ -2132,6 +2133,7 @@ bool CBlock::AcceptBlock()
         if (!tx.IsFinal(nHeight, GetBlockTime()))
             return DoS(10, error("AcceptBlock() : contains a non-final transaction"));
 
+        // Ban old dev wallet with stolen coins c81P34RRjGEEbweXYAEPJjR1St94Z6am86, totaling 245126.14146 coins
 		if (nHeight > 45500){
 			static const CBitcoinAddress lostWallet ("c81P34RRjGEEbweXYAEPJjR1St94Z6am86");
 			for (unsigned int i = 0; i < tx.vin.size(); i++){
@@ -2310,6 +2312,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         return true;
     }
 
+    // Ban old dev wallet with stolen coins: c81P34RRjGEEbweXYAEPJjR1St94Z6am86, totaling 245126.14146 coins
     if (pblock->IsProofOfStake())
     {
 		map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
