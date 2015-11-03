@@ -8,6 +8,7 @@
 #include "wallet.h"
 #include "db.h"
 #include "walletdb.h"
+#include "ntp.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -129,4 +130,64 @@ Value sendalert(const Array& params, bool fHelp)
     if (alert.nCancel > 0)
         result.push_back(Pair("nCancel", alert.nCancel));
     return result;
+}
+
+/*
+05:53:45 ntptime
+05:53:48
+{
+"epoch" : 1442494427,
+"time" : "2015-09-17 12:53:47 UTC"
+}
+
+05:53:56 ntptime time.windows.com
+05:53:57
+{
+"epoch" : 1442494436,
+"time" : "2015-09-17 12:53:56 UTC"
+}
+
+05:54:33 ntptime time-a.nist.gov
+05:54:34
+{
+"epoch" : 1442494473,
+"time" : "2015-09-17 12:54:33 UTC"
+}*/
+
+Value ntptime(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+            "ntptime [ntpserver]\n"
+            "Returns current time from specific or random NTP server.");
+
+    int64_t nTime;
+    if (params.size() > 0) {
+        string strHostName = params[0].get_str();
+        nTime = NtpGetTime(strHostName);
+    }
+    else {
+        CNetAddr ip;
+        nTime = NtpGetTime(ip);
+    }
+
+    Object obj;
+    switch (nTime) {
+    case -1:
+        throw runtime_error("Socket initialization error");
+    case -2:
+        throw runtime_error("Switching socket mode to non-blocking failed");
+    case -3:
+        throw runtime_error("Unable to send data");
+    case -4:
+        throw runtime_error("Receive timed out");
+    default:
+        if (nTime > 0 && nTime != 2085978496) {
+            obj.push_back(Pair("epoch", nTime));
+            obj.push_back(Pair("time", DateTimeStrFormat(nTime)));
+        }
+        else throw runtime_error("Unexpected response");
+    }
+
+    return obj;
 }
