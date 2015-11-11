@@ -435,3 +435,9 @@ void RPCConsole::on_showCLOptionsButton_clicked()
     GUIUtil::HelpMessageBox help;
     help.exec();
 }
+
+void RPCConsole::showTab_Debug()
+{
+    ui->tabWidget->setCurrentIndex(1);
+    this->show();
+}
